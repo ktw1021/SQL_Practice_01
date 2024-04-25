@@ -18,7 +18,7 @@ ORDER BY max_salary DESC;
 --문제3. 담당 매니저가 배정되어있으나 커미션비율이 없고, 월급이 3000초과인 
 --직원의 이름, 매니저아이디, 커미션 비율, 월급 을 출력하세요.
 
-SELECT first_name 이름, manager_id 매니저아이디, commission_pct "커미션 비율", salary 월급
+SELECT first_name 이름, manager_id 매니저아이디, NVL(commission_pct,0) "커미션 비율", salary 월급
 FROM Employees
 WHERE manager_id IS NOT NULL
 AND commission_pct IS NULL
@@ -65,13 +65,19 @@ ORDER BY LENGTH(department_name) DESC;
 --문제9. 정확하지 않지만, 지사가 있을 것으로 예상되는 나라들을 나라이름을 대문자로 출력하고
 --올림차순(ASC)으로 정렬해 보세오.
 
-SELECT country_name
+SELECT UPPER(country_name) 나라이름
 FROM Countries
-ORDER BY UPPER(country_name) DESC;
+ORDER BY country_name DESC;
 
 --문제10. 입사일이 03/12/31 일 이전 입사한 직원의 이름, 월급, 전화 번호, 입사일을 출력하세요
 --전화번호는 545-343-3433 과 같은 형태로 출력하시오.
 
 SELECT first_name 이름, salary 월급, REGEXP_REPLACE(phone_number, '^\d\.(\d{3})\.(\d{3})\.(\d{4})$', '\1-\2-\3') "전화 번호", TO_CHAR(hire_date,'YYYY-MM-DD') 입사일
+FROM Employees
+WHERE hire_date < '13/12/31';
+
+SELECT first_name 이름, salary 월급, 
+SUBSTR(REPLACE(phone_number,'.' ,'-'),3,12) "전화 번호", 
+TO_CHAR(hire_date,'YYYY-MM-DD') 입사일
 FROM Employees
 WHERE hire_date < '13/12/31';
