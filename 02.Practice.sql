@@ -75,6 +75,12 @@ SELECT job_title,
 max_salary- min_salary
 FROM Jobs;
 
+SELECT job_id,
+       MAX(salary) - MIN(salary) diff
+    FROM Employees
+    GROUP BY job_id
+    ORDER BY diff DESC;
+
 --채찍피티 문제01.
 SELECT d.department_name 부서명,
 ROUND(AVG(e.salary)) 평균임금
