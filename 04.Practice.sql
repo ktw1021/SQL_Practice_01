@@ -35,6 +35,19 @@ SELECT l.location_id, l.street_address, l.postal_code, l.city, l.state_province,
      JOIN Employees e ON d.department_id = e.department_id
     WHERE e.first_name = 'Steven'
     AND e.last_name = 'King';
+    
+    SELECT location_id,
+           street_address,
+           postal_code,
+           city,
+           state_province,
+           country_id
+        FROM Locations
+        WHERE location_id = (SELECT location_id FROM Departments
+                            WHERE department_id = (SELECT department_id FROM Employees
+                                                    WHERE first_name = 'Steven' AND
+                                                            last_name = 'King')
+                            );
 
 -- 문제4. job_id 가 'ST_MAN' 인 직원의 급여보다 작은 직원의 사번,이름,급여를 
 -- 급여의 내림차순으로출력하세요 -ANY연산자 사용(74건)
