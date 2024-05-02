@@ -32,12 +32,60 @@ SELECT first_name, manager_id, NVL(commission_pct,0), salary
 --매니저별 평균급여가 5000이상만 출력합니다.
 --매니저별 평균급여의 내림차순으로 출력합니다.
 --매니저별 평균급여는 소수점 첫째자리에서 반올림 합니다.
---출력내용은 매니저 아이디, 매니저이름(first_name), 매니저별 평균급여, 매니저별 최소급여,
---매니저별 최대급여 입니다.(9건)
+--출력내용은 매니저 아이디, 매니저이름(first_name), 
+--매니저별 평균급여, 매니저별 최소급여,매니저별 최대급여 입니다.(9건)
         
-        SELECT e2.first_name, e2.salary
+        SELECT e.manager_id 매니저ID, 
+                e2.first_name 매니저명,
+                ROUND(AVG(e.salary)) 평균급여,
+                MIN(e.salary) 최소급여,
+                MAX(e.salary) 최대급여
         FROM Employees e
-        WHERE e2.salary > 5000
         JOIN Employees e2 ON e.manager_id=e2.employee_id
-        GROUP BY e2.first_name, e2.salary;
-        
+        WHERE e.hire_date > '2014-12-31'
+        GROUP BY e.manager_id, e2.first_name
+        HAVING AVG(e.salary) >= 5000
+        ORDER BY AVG(e.salary) DESC
+        ;
+
+--문제4.각 사원(employee)에 대해서 사번(employee_id), 이름(first_name), 부서명
+--(department_name), 매니저(manager)의 이름(first_name)을 조회하세요.
+--부서가 없는 직원(Kimberely)도 표시합니다.(106명)
+    SELECT e.employee_id, e.first_name, d.department_name, e2.first_name
+    FROM Employees e
+    Join Employees e2 ON e.manager_id=e2.employee_id
+    LEFT JOIN Departments d On e.department_id=d.department_id;
+    
+--문제5. 2015년 이후 입사한 직원 중에 입사일이 11번째에서 20번째의 직원의
+--사번, 이름, 부서명, 급여, 입사일을 입사일 순서로 출력하세요
+    SELECT employee_id, first_name, department_name, salary, hire_date
+        FROM (
+        SELECT ROW_NUMBER () OVER (ORDER BY hire_date) rn,
+        e.employee_id, e.first_name, d.department_name, e.salary, hire_date
+        FROM Employees e
+        JOIN Departments d ON e.department_id=d.department_id
+        WHERE e.hire_date > '2014/12/31'
+        )
+        WHERE rn >= 11 AND rn<= 20
+        ORDER BY hire_date 
+        ;
+--문제6. 가장 늦게 입사한 직원의 
+--이름(first_name last_name)과 연봉(salary)과 근무하는 부서 이름(department_name)은?
+SELECT e.first_name || ' ' || e.last_name 이름, e.salary 급여, d.department_name 부서이름, e.hire_date
+        FROM Employees e
+        JOIN Departments d ON e.department_id=d.department_id
+        WHERE e.hire_date = (
+                        SELECT MAX(hire_date)
+                        FROM Employees
+                        );
+--문제7. 평균연봉(salary)이 가장 높은 부서 직원들의 
+--직원번호(employee_id), 이름(firt_name), 성(last_name)과 업무(job_title), 연봉(salary)을 조회하시오.
+SELECT e.employee_id, e.first_name, e.last_name, j.job_title, e.salary
+        FROM Employees e
+        JOIN Jobs j ON e.job_id = j.job_id
+        WHERE e.department_id IN (
+                    SELECT department_id
+                    FROM Employees
+                    GROUP BY department_id
+                    ORDER BY AVG(salary) DESC)
+                    ;
