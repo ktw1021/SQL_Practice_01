@@ -80,12 +80,50 @@ SELECT e.first_name || ' ' || e.last_name 이름, e.salary 급여, d.department_
                         );
 --문제7. 평균연봉(salary)이 가장 높은 부서 직원들의 
 --직원번호(employee_id), 이름(firt_name), 성(last_name)과 업무(job_title), 연봉(salary)을 조회하시오.
-SELECT e.employee_id, e.first_name, e.last_name, j.job_title, e.salary
-        FROM Employees e
-        JOIN Jobs j ON e.job_id = j.job_id
-        WHERE e.department_id IN (
+SELECT e.employee_id 사번, e.department_id 부서ID, e.first_name 이름, e.last_name 성, j.job_title 업무, e.salary 연봉, 
+ROUND((SELECT AVG(salary) FROM Employees WHERE department_id = (
+            SELECT department_id FROM (
+                    SELECT department_id FROM Employees GROUP BY department_id ORDER BY AVG(salary) DESC
+                                        ) WHERE ROWNUM = 1
+                                  )
+                            )) 부서평균
+    FROM Employees e
+    JOIN Jobs j ON e.job_id = j.job_id
+    WHERE department_id IN (
+            SELECT department_id
+            FROM (
                     SELECT department_id
                     FROM Employees
                     GROUP BY department_id
-                    ORDER BY AVG(salary) DESC)
-                    ;
+                    ORDER BY AVG(salary) DESC
+                    )
+                    WHERE rownum = 1
+    );
+--문제8.평균 급여(salary)가 가장 높은 부서는?
+SELECT d.department_name
+    FROM Departments d
+    JOIN Employees e ON d.department_id = e.department_id
+    WHERE department_name = (
+            SELECT department_name
+            FROM (
+                SELECT department_name
+                FROM Departments d2
+                JOIN Employees e2 ON d2.department_id = e2.department_id
+                GROUP BY d2.department_name
+                ORDER BY AVG(e2.salary) DESC
+                )
+            WHERE rownum = 1
+        )
+        AND rownum=1;
+--문제9. 평균 급여(salary)가 가장 높은 지역은?
+SELECT region_name
+    FROM Regions r
+    JOIN Countries c ON r.region_id = c.region_id
+    JOIN Locations l ON c.country_id = l.country_id
+    JOIN Departments d ON l.location_id = d.location_id
+    JOIN Employees e ON d.department_id = e.department_id
+    WHERE region_name = (
+        SELECT region_name 
+        FROM (
+            SELECT region_name
+            FROM 
