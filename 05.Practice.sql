@@ -126,4 +126,31 @@ SELECT region_name
         SELECT region_name 
         FROM (
             SELECT region_name
-            FROM 
+            FROM Regions r2
+            JOIN Countries c2 ON r2.region_id = c2.region_id
+            JOIN Locations l2 ON c2.country_id = l2.country_id
+            JOIN Departments d2 ON l2.location_id = d2.location_id
+            JOIN Employees e2 ON d2.department_id = e2.department_id
+            GROUP BY r2.region_name
+            ORDER BY AVG(e2.salary) DESC
+            )
+            WHERE rownum = 1
+            )
+            AND rownum = 1;
+
+--문제10. 평균 급여(salary)가 가장 높은 업무는?
+SELECT job_title 
+    FROM Jobs j
+    JOIN Employees e ON j.job_id = e.job_id
+    WHERE job_title = (
+            SELECT job_title
+            FROM (
+                SELECT job_title
+                FROM Jobs j2
+                JOIN Employees e2 ON j2.job_id = e2.job_id
+                GROUP BY j2.job_title
+                ORDER BY AVG(e2.salary) DESC
+                )
+                WHERE rownum = 1
+            )
+    AND rownum = 1;
