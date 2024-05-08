@@ -1,6 +1,6 @@
 -- 문제1. 담당 매니저가 배정되어있으나 커미션비율이 없고, 월급이 3000초과인 직원의
 -- 이름, 매니저 아이디, 커미션 비율, 월급을 출력하세요.(45건)
-SELECT first_name, manager_id, NVL(commission_pct,0), salary
+SELECT first_name 이름, manager_id 매니저ID, NVL(commission_pct,0) "커미션 비율", salary 월급
         FROM Employees
     WHERE manager_id IS NOT NULL 
     AND commission_pct IS NULL
@@ -154,3 +154,26 @@ SELECT job_title
                 WHERE rownum = 1
             )
     AND rownum = 1;
+    
+    -- 사원 이름과 매니저 이름
+    SELECT e.first_name, e2.first_name
+        FROM Employees e
+        JOIN Employees e2 ON e.manager_id=e2.employee_id;
+        
+    -- 부분 이름 검색, 성, 이름에 대한 OR 검색, 
+    -- 이름 성, Email, 전화번호, 입사일
+    SELECT last_name || ' ' || first_name AS full_name, 
+    email AS mail, 
+    phone_number AS ph, 
+    TO_CHAR(hire_date,'YYYY-MM-DD') AS hire_date
+        FROM Employees
+        WHERE LOWER(last_name) LIKE '%s%'
+        OR LOWER(first_name) LIKE '%s%';
+        
+    -- 이름 성, 급여
+    -- 2000< x < 10000
+    SELECT last_name || ' ' || first_name AS full_name,
+           salary
+        FROM Employees 
+        WHERE salary >= 2000 AND salary <= 10000
+        ORDER BY salary;
